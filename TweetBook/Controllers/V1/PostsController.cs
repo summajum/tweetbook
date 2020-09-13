@@ -40,17 +40,36 @@ namespace TweetBook.Controllers.V1
             return Ok(post);
         }
 
+        [HttpPut(ApiRoutes.Posts.Update)]
+        public IActionResult Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest postRequest)
+        {
+            var post = new Post
+            {
+                Id = postId,
+                Name = postRequest.Name
+            };
+
+            var isUpdated = _postService.UpdatePost(post);
+
+            if (isUpdated)
+                return Ok(post);
+            return NotFound();
+        }
+
         [HttpPost(ApiRoutes.Posts.Create)]
         public IActionResult Create([FromBody] CreatePostRequest postRequest)
         {
             var post = new Post ();
 
-            if (postRequest.Id == Guid.Empty)
+            if (postRequest != null)
             {
-                post.Id = Guid.NewGuid();
+                if (postRequest.Id != Guid.Empty)
+                {
+                    post.Id = postRequest.Id;
+                }
             } else
             {
-                post.Id = postRequest.Id;
+                post.Id = Guid.NewGuid();
             }
 
             _postService.GetAllPost().Add(post);
