@@ -1,58 +1,59 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using TweetBook.Data;
 using TweetBook.Domain;
 
 namespace TweetBook.Services
 {
     public class PostService : IPostService
     {
-        private readonly List<Post> _posts;
+        private readonly DataContext _dataContext;
 
-        public PostService()
+        public PostService(DataContext dataContext)
         {
-            _posts = new List<Post>();
-            for (int i = 0; i < 5; i++)
+            _dataContext = dataContext;
+        }
+
+        public async Task<List<Post>> GetAllPostAsync()
+        {
+            return await _dataContext.Posts.ToListAsync();
+        }
+
+        public async Task<Post> GetPostByIdAsync(Guid postId)
+        {
+            return await _dataContext.Posts.SingleOrDefaultAsync(x => x.Id == postId);
+        }
+
+        public async Task<bool> UpdatePostAsync(Post postToUpdate)
+        {
+            _dataContext.Posts.Update(postToUpdate);
+            var updated = await _dataContext.SaveChangesAsync();
+            return updated > 0;
+        }
+
+        public async Task<bool> DeletePostAsync(Guid postId)
+        {
+            var post = await this.GetPostByIdAsync(postId);
+            if (post != null)
             {
-                _posts.Add(new Post
-                {
-                    Id = Guid.NewGuid(),
-                    Name = $"Mesage Id {i}"
-                });
+                _dataContext.Posts.Remove(post);
+                var deleted = await _dataContext.SaveChangesAsync();
+                return deleted > 0;
             }
+            return false;            
         }
 
-        public List<Post> GetAllPost()
+        public async Task<bool> CreatePostAsync(Post createPost)
         {
-            return _posts;
-        }
+            await _dataContext.Posts.AddAsync(createPost);
+            var created = await _dataContext.SaveChangesAsync();
 
-        public Post GetPostById(Guid postId)
-        {
-            return _posts.SingleOrDefault(x => x.Id == postId);
-        }
-
-        public bool UpdatePost(Post postToUpdate)
-        {
-            var postExists = this.GetPostById(postToUpdate.Id) != null;
-
-            if (!postExists)
-                return false;
-
-            var index = _posts.FindIndex(x => x.Id == postToUpdate.Id);
-            _posts[index] = postToUpdate;
-            return true;
-        }
-
-        public bool DeletePost(Guid postId)
-        {
-            var post = this.GetPostById(postId);
-
-            if (post == null)
-                return false;
-            return _posts.Remove(post);
+            return created > 0;
         }
     }
 }
