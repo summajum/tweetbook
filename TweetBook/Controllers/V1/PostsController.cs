@@ -40,6 +40,16 @@ namespace TweetBook.Controllers.V1
             return Ok(post);
         }
 
+        [HttpDelete(ApiRoutes.Posts.Delete)]
+        public IActionResult Delete([FromRoute] Guid postId)
+        {
+            var isPostDeleted = _postService.DeletePost(postId);
+
+            if (isPostDeleted)
+                return NoContent();
+            return NotFound();
+        }
+
         [HttpPut(ApiRoutes.Posts.Update)]
         public IActionResult Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest postRequest)
         {
@@ -66,10 +76,12 @@ namespace TweetBook.Controllers.V1
                 if (postRequest.Id != Guid.Empty)
                 {
                     post.Id = postRequest.Id;
+                    post.Name = postRequest.Name;
                 }
             } else
             {
                 post.Id = Guid.NewGuid();
+                post.Name = "Default Name";
             }
 
             _postService.GetAllPost().Add(post);
