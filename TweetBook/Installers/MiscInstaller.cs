@@ -10,6 +10,7 @@ using TweetBook.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TweetBook.Services;
 
 namespace TweetBook.Installers
 {
@@ -41,6 +42,8 @@ namespace TweetBook.Installers
                 };
             });
 
+            services.AddScoped<IIdentityService, IdentityService>();
+
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new OpenApiInfo
@@ -48,9 +51,7 @@ namespace TweetBook.Installers
                     Title = "TweetBook Api Swagger Doc",
                     Description = "TweetBook Api Swagger Desc",
                     Version = "TweetBook Api Swagger V1"
-                });
-
-                             
+                });                             
 
                 x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
                 {
@@ -74,9 +75,7 @@ namespace TweetBook.Installers
                         },
                         new string[] {}
                     }
-                });
-
-
+                });                
             });
         }
     }
