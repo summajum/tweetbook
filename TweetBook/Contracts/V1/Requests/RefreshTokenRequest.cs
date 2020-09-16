@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TweetBook.Domain
+namespace TweetBook.Contracts.V1.Requests
 {
-    public class AuthenticationResult
+    public class RefreshTokenRequest
     {
         public string Token { get; set; }
+
         public string RefreshToken { get; set; }
-        public bool  IsSuccess { get; set; }
-        public IEnumerable<string> ErrorMessage { get; set; }
     }
 }
