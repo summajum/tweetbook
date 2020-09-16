@@ -10,5 +10,6 @@ namespace TweetBook.Services
     public interface IIdentityService
     {
         Task<AuthenticationResult> RegisterUserAsync(string email, string password);
+        Task<AuthenticationResult> LoginUserAsync(string email, string password);
     }
 }
